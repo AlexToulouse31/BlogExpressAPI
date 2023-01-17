@@ -26,14 +26,16 @@ usersRouter.get('/', async (req, res) => {
 });
 
 
-usersRouter.post('/register', (req, res) => {
+usersRouter.post('/register', async (req, res) => {
+
     const password = req.body.password;
-    const user_id = req.body.user_id;
+    const username = req.body.username;
+    const email = req.body.email;
 
     bcrypt.hash(password, 10, async (err, hash) => {
         try {
 
-            const data = await client.query('INSERT INTO users (user_id, password) VALUES ($1, $2) returning *;', [user_id, hash]);
+            const data = await client.query('INSERT INTO users (username, password, email) VALUES ($1, $2, $3) returning *;', [username, hash, email]);
 
             res.status(201).json({
                 status: "created",
@@ -51,24 +53,25 @@ usersRouter.post('/register', (req, res) => {
     });
 });
 
-usersRouter.post('/login', async (req, res) => {
+/*usersRouter.post('/login', async (req, res) => {
     const user_id = req.body.user_id;
     const password = req.body.password;
 
     try {
         const data = await client.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
         if (data.rows.length === 0) {
-             
+
             res.status(404).json({ error: "User not found" });
         } else {
             const requestDB = await client.query('SELECT password,id FROM users WHERE user_id = $1', [user_id])
-            const accessToken = jwt.sign({ userId: requestDB.rows[0]['id']}, accessTokenSecret)
+            const accessToken = jwt.sign({ userId: requestDB.rows[0]['id'] }, accessTokenSecret)
             const dbHash = data.rows[0]['password'];
             bcrypt.compare(password, dbHash, function (err, result) {
                 if (result === true) {
-                    res.json({ 
+                    res.json({
                         message: "Login successful",
-                    data : accessToken });
+                        data: accessToken
+                    });
                 } else {
                     res.status(401).json({ error: "Incorrect password" });
                 }
@@ -78,6 +81,6 @@ usersRouter.post('/login', async (req, res) => {
         console.log(err.stack);
         res.status(500).json({ error: "An error occured while trying to log in" });
     }
-});
+});*/
 
 module.exports = usersRouter;
