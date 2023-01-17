@@ -44,7 +44,7 @@ class ArticlesController {
 
     async postArticles(req, res) {
         try {
-            const {title, text, user_id} = req.body
+            const { title, text, user_id } = req.body
             const data = await articlesService.postArticles(title, text);
 
             res.status(201).json({
@@ -63,7 +63,7 @@ class ArticlesController {
 
     async putArticles(req, res) {
         const id = Number(req.params.id);
-        const {title, text, user_id} = req.body
+        const { title, text, user_id } = req.body
         try {
             const data = await articlesService.putArticles(id, title, text);
             res.status(200).json({
@@ -80,8 +80,26 @@ class ArticlesController {
                 data: null
             })
         }
-    }
+    };
 
+    async deleteArticles(req, res) {
+        const id = req.params.id;
+        const userId = req.userId
+        try {
+            const data = await articlesService.deleteArticles(id);
+            res.status(200).json({
+                status: "deleted",
+                data: data
+            })
+        }
+
+        catch (err) {
+            res.status(404).json({
+                status: "not found",
+                data: null
+            })
+        }
+    }
 };
 
 
