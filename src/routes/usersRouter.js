@@ -25,7 +25,6 @@ usersRouter.get('/', async (req, res) => {
     }
 });
 
-
 usersRouter.post('/register', async (req, res) => {
 
     const password = req.body.password;
@@ -53,18 +52,18 @@ usersRouter.post('/register', async (req, res) => {
     });
 });
 
-/*usersRouter.post('/login', async (req, res) => {
-    const user_id = req.body.user_id;
+usersRouter.post('/login', async (req, res) => {
+    const username = req.body.username;
     const password = req.body.password;
 
     try {
-        const data = await client.query('SELECT * FROM users WHERE user_id = $1', [user_id]);
+        const data = await client.query('SELECT * FROM users WHERE username = $1', [username]);
         if (data.rows.length === 0) {
 
             res.status(404).json({ error: "User not found" });
         } else {
-            const requestDB = await client.query('SELECT password,id FROM users WHERE user_id = $1', [user_id])
-            const accessToken = jwt.sign({ userId: requestDB.rows[0]['id'] }, accessTokenSecret)
+            const requestDB = await client.query('SELECT password,id FROM users WHERE username = $1', [username])
+            const accessToken = jwt.sign({ username: requestDB.rows[0]['id'] }, accessTokenSecret)
             const dbHash = data.rows[0]['password'];
             bcrypt.compare(password, dbHash, function (err, result) {
                 if (result === true) {
@@ -81,6 +80,6 @@ usersRouter.post('/register', async (req, res) => {
         console.log(err.stack);
         res.status(500).json({ error: "An error occured while trying to log in" });
     }
-});*/
+});
 
 module.exports = usersRouter;
