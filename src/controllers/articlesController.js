@@ -45,7 +45,7 @@ class ArticlesController {
     async postArticles(req, res) {
         try {
             const { title, text, user_id } = req.body
-            const data = await articlesService.postArticles(title, text);
+            const data = await articlesService.postArticles(title, text, user_id );
 
             res.status(201).json({
                 status: "created",
