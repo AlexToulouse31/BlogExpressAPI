@@ -47,13 +47,13 @@ class ArticlesController {
         const user_id = req.userId
         const { title, text } = req.body
 
-        if (!title && !(typeof(title) == 'string')) {
+        if (!title && !(typeof (title) == 'string')) {
             res.status(400).json({
                 status: "Missing title or incorrect type",
                 data: null
             })
         }
-        else if (!text && !(typeof(text) == 'string')) {
+        else if (!text && !(typeof (text) == 'string')) {
             res.status(400).json({
                 status: "Missing text",
                 data: null
@@ -82,26 +82,26 @@ class ArticlesController {
     async putArticles(req, res) {
         const id = Number(req.params.id);
         const user_idLogged = req.userId;
-        const { title, text} = req.body
+        const { title, text } = req.body
 
-        if (!title && !(typeof(title) == 'string')) {
+        if (!title && !(typeof (title) == 'string')) {
             res.status(400).json({
                 status: "Missing title or incorrect type",
                 data: null
             })
         }
-        else if (!text && !(typeof(text) == 'string')) {
+        else if (!text && !(typeof (text) == 'string')) {
             res.status(400).json({
                 status: "Missing text",
                 data: null
             })
         }
-        else if (!id && !(typeof(id) == 'number')) {
-                res.status(400).json({
-                    status: "Missing id or incorrect type",
-                    data: null
-                })
-            }
+        else if (!id && !(typeof (id) == 'number')) {
+            res.status(400).json({
+                status: "Missing id or incorrect type",
+                data: null
+            })
+        }
         else {
             const article = await articlesService.selectArticleById(id);
             if (!article) {
@@ -137,11 +137,12 @@ class ArticlesController {
             }
         };
     }
+
     async deleteArticles(req, res) {
         const deleteId = req.params.id;
         const user_idLogged = req.userId
 
-        if (!id && !(typeof(id) == 'number')) {
+        if (!deleteId && !(typeof (deleteId) == 'number')) {
             res.status(400).json({
                 status: "Missing id or incorrect type",
                 data: null
@@ -149,6 +150,22 @@ class ArticlesController {
         }
 
         else {
+            const article = await articlesService.selectArticleById(deleteId);
+            if (!article) {
+                res.status(400).json({
+                    status: "Article id unknown",
+                    data: null
+                })
+                return
+            }
+            else if (user_idLogged != article[0].user_id) {
+                res.status(403).json({
+                    status: "Updated impossible - Bad Authorization",
+                    data: null
+                })
+                return
+            }
+
             try {
                 const data = await articlesService.deleteArticles(deleteId);
                 res.status(200).json({
