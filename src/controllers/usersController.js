@@ -26,57 +26,90 @@ class UsersController {
     async register(req, res) {
         const { username, password, email } = req.body;
 
-        bcrypt.hash(password, 10, async (err, hash) => {
-            try {
-                const data = await usersService.addUser(username, hash, email);
-                res.status(201).json({
-                    status: "created",
-                    data: data
-                })
-            }
+        if (!username) {
+            res.status(400).json({
+                status: "Missing username",
+                data: null
+            })
+        }
+        else if (!password) {
+            res.status(400).json({
+                status: "Missing password",
+                data: null
+            })
+        }
+        else if (!email) {
+            res.status(400).json({
+                status: "Missing password",
+                data: null
+            })
+        }
+        else {
+            bcrypt.hash(password, 10, async (err, hash) => {
+                try {
+                    const data = await usersService.addUser(username, hash, email);
+                    res.status(201).json({
+                        status: "created",
+                        data: data
+                    })
+                }
 
-            catch (err) {
-                console.log(err);
-                res.status(404).json({
-                    status: "not found",
-                    data: null
-                })
-            }
-        })
-    };
+                catch (err) {
+                    console.log(err);
+                    res.status(404).json({
+                        status: "not found",
+                        data: null
+                    })
+                }
+            })
+        };
+    }
 
     async login(req, res) {
         const username = req.body.username;
         const password = req.body.password;
 
-    try {
-        const data = await usersService.selectUserByUsername(username);
-        if (!data) {
-
-            res.status(404).json({ error: "User not found" });
-        } else {
-            const accessToken = jwt.sign({ username: data.id }, accessTokenSecret)
-            const dbHash = data.password;
-            console.log(accessToken);
-            console.log(dbHash);
-            bcrypt.compare(password, dbHash, function (err, result) {
-                if (result === true) {
-                    res.json({
-                        message: "Login successful",
-                        data: accessToken
-                    });
-                } else {
-                    res.status(401).json({ error: "Incorrect password" });
-                }
-            });
+        if (!username) {
+            res.status(400).json({
+                status: "Missing username",
+                data: null
+            })
         }
-    } catch (err) {
-        console.log(err.stack);
-        res.status(500).json({ error: "An error occured while trying to log in" });
-    }
-};
-}
+        else if (!password) {
+            res.status(400).json({
+                status: "Missing password",
+                data: null
+            })
+        }
 
+        else {
+            try {
+                const data = await usersService.selectUserByUsername(username);
+                if (!data) {
+
+                    res.status(404).json({ error: "User not found" });
+                } else {
+                    const accessToken = jwt.sign({ username: data.id }, accessTokenSecret)
+                    const dbHash = data.password;
+                    bcrypt.compare(password, dbHash, function (err, result) {
+                        if (result === true) {
+                            res.json({
+                                message: "Login successful",
+                                data: accessToken
+                            });
+                        } else {
+                            res.status(401).json({ error: "Incorrect password" });
+                        }
+                    })
+                }
+            }
+            catch (err) {
+                console.log(err.stack);
+                res.status(500).json({ error: "An error occured while trying to log in" });
+            }
+        }
+    }
+}
 
 
 module.exports = UsersController

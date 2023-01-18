@@ -10,7 +10,7 @@ class ArticlesService {
         return undefined
     }
 
-    async selectAllArticlesById(id) {
+    async selectArticleById(id) {
         const data = await client.query('SELECT * FROM articles WHERE id = $1', [id]);
         if (data.rowCount) {
             return data.rows

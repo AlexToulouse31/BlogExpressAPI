@@ -5,14 +5,14 @@ const ArticlesController = require('../controllers/articlesController');
 const authenticateJWT = require('../middlewares/auth');
 const articlesController = new ArticlesController()
 
-articlesRouter.get('/', /*authenticateJWT,*/ articlesController.getArticles);
+articlesRouter.get('/', articlesController.getArticles);
 
-articlesRouter.get('/:id', /*authenticateJWT,*/articlesController.getArticleById);
+articlesRouter.get('/:id', articlesController.getArticleById);
 
-articlesRouter.post('/', /*authenticateJWT,*/ articlesController.postArticles);
+articlesRouter.post('/', authenticateJWT, articlesController.postArticles);
 
-articlesRouter.put('/:id', /*authenticateJWT, */ articlesController.putArticles);
+articlesRouter.put('/:id', authenticateJWT, articlesController.putArticles);
 
-articlesRouter.delete('/:id', /*authenticateJWT, */ articlesController.deleteArticles);
+articlesRouter.delete('/:id', authenticateJWT, articlesController.deleteArticles);
 
 module.exports = articlesRouter
