@@ -1,12 +1,12 @@
-const { text } = require("express");
-const articlesRouter = require("../routes/articlesRouter");
-const ArticlesService = require("../services/articlesService");
-const articlesService = new ArticlesService();
+const { message } = require("express");
+const commentsRouter = require("../routes/commentsRouter");
+const CommentsService = require("../services/commentsService");
+const commentsService = new CommentsService();
 
-class ArticlesController {
-    async getArticles(req, res) {
+class CommentsController {
+    async getComments(req, res) {
         try {
-            const data = await articlesService.selectAllArticles();
+            const data = await commentsService.selectAllComments();
             res.status(200).json({
                 status: "success",
                 message: "succes",
@@ -23,10 +23,10 @@ class ArticlesController {
         }
     };
 
-    async getArticleById(req, res) {
-        const id = req.params.id;
+    async getCommentsByArticleId(req, res) {
+        const article_id = req.params.article_id;
         try {
-            const data = await articlesService.selectArticleById(i);
+            const data = await commentsService.selectCommentsByArticleId(i);
 
             res.status(200).json({
                 status: "success",
@@ -41,29 +41,30 @@ class ArticlesController {
         }
     };
 
-    async postArticles(req, res) {
+    async postComments(req, res) {
         const user_id = req.userId
-        const { title, text } = req.body
+        const article_id = req.params.id
+        const message = req.body.message
 
-        if (!title && !(typeof (title) == 'string')) {
+        if (!message && !(typeof (message) == 'string')) {
             res.status(400).json({
-                status: "Missing title or incorrect type",
+                status: "Missing message or incorrect type",
                 data: null
             })
         }
-        else if (!text && !(typeof (text) == 'string')) {
+        else if (!article_id && !(typeof (article_id) == 'number')) {
             res.status(400).json({
-                status: "Missing text",
+                status: "Missing article or incorrect type",
                 data: null
             })
         }
 
         else {
             try {
-                const data = await articlesService.postArticles(title, text, user_id);
+                const data = await commentsService.postComments(message, article_id, user_id);
 
                 res.status(201).json({
-                    status: "created",
+                    status: "comments created",
                     data: data
                 })
             }
@@ -77,39 +78,35 @@ class ArticlesController {
         };
     }
 
-    async putArticles(req, res) {
+    async putComments(req, res) {
         const id = Number(req.params.id);
         const user_idLogged = req.userId;
-        const { title, text } = req.body
+        const message = req.body.message
 
-        if (!title && !(typeof (title) == 'string')) {
+        if (!message && !(typeof (message) == 'string')) {
             res.status(400).json({
-                status: "Missing title or incorrect type",
+                status: "Missing message or incorrect type",
                 data: null
             })
         }
-        else if (!text && !(typeof (text) == 'string')) {
-            res.status(400).json({
-                status: "Missing text",
-                data: null
-            })
-        }
+
         else if (!id && !(typeof (id) == 'number')) {
             res.status(400).json({
-                status: "Missing id or incorrect type",
+                status: "Missing article id or incorrect type",
                 data: null
             })
         }
+
         else {
-            const article = await articlesService.selectArticleById(id);
-            if (!article) {
+            const comment = await commentsService.selectCommentById(id);
+            if (!comment) {
                 res.status(400).json({
-                    status: "Article id unknown",
+                    status: "Comment id unknown",
                     data: null
                 })
                 return
             }
-            else if (user_idLogged != article[0].user_id) {
+            else if (user_idLogged != comment.user_id) {
                 res.status(403).json({
                     status: "Updated impossible - Bad Authorization",
                     data: null
@@ -118,10 +115,10 @@ class ArticlesController {
             }
 
             try {
-                const data = await articlesService.putArticles(id, title, text);
+                const data = await commentsService.putComments(id, message);
                 res.status(200).json({
                     status: "success",
-                    message: "article updated",
+                    message: "comment updated",
                     data: data
 
                 })
@@ -136,7 +133,7 @@ class ArticlesController {
         };
     }
 
-    async deleteArticles(req, res) {
+    async deleteComments(req, res) {
         const deleteId = req.params.id;
         const user_idLogged = req.userId
 
@@ -148,15 +145,15 @@ class ArticlesController {
         }
 
         else {
-            const article = await articlesService.selectArticleById(deleteId);
-            if (!article) {
+            const comment = await commentsService.selectCommentById(deleteId);
+            if (!comment) {
                 res.status(400).json({
-                    status: "Article id unknown",
+                    status: "Comment id unknown",
                     data: null
                 })
                 return
             }
-            else if (user_idLogged != article[0].user_id) {
+            else if (user_idLogged != comment.user_id) {
                 res.status(403).json({
                     status: "Updated impossible - Bad Authorization",
                     data: null
@@ -165,7 +162,7 @@ class ArticlesController {
             }
 
             try {
-                const data = await articlesService.deleteArticles(deleteId);
+                const data = await commentsService.deleteComments(deleteId);
                 res.status(200).json({
                     status: "deleted",
                     data: data
@@ -173,7 +170,7 @@ class ArticlesController {
             }
 
             catch (err) {
-                res.status(404).json({
+                res.status(500).json({
                     status: "not found",
                     data: null
                 })
@@ -182,4 +179,4 @@ class ArticlesController {
     }
 }
 
-module.exports = ArticlesController
+module.exports = CommentsController

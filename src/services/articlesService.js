@@ -1,6 +1,5 @@
 const client = require("../client");
 
-
 class ArticlesService {
     async selectAllArticles() {
         const data = await client.query('SELECT * FROM articles');
