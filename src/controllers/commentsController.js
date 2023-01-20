@@ -1,12 +1,16 @@
 const { message } = require("express");
 const commentsRouter = require("../routes/commentsRouter");
+const ArticlesService = require("../services/articlesService");
 const CommentsService = require("../services/commentsService");
+
 const commentsService = new CommentsService();
+const articlesService= new ArticlesService();
 
 class CommentsController {
-    async getComments(req, res) {
+    async getAllComments(req, res) {
         try {
             const data = await commentsService.selectAllComments();
+
             res.status(200).json({
                 status: "success",
                 message: "succes",
@@ -14,8 +18,9 @@ class CommentsController {
             })
         }
         catch (err) {
-            console.log(err.stack)
-            res.status(400).json({
+            console.log(err.stack);
+
+            res.status(500).json({
                 status: "fail",
                 message: "erreur de syntaxe",
                 data: null
@@ -26,22 +31,30 @@ class CommentsController {
     async getCommentsByArticleId(req, res) {
         const article_id = req.params.article_id;
         try {
-            const data = await commentsService.selectCommentsByArticleId(i);
+            const data = await commentsService.selectCommentsByArticleId(article_id);
 
-            res.status(200).json({
-                status: "success",
-                data: data
-            })
+            if (!data) {
+                res.status(200).json({
+                    status: "success",
+                    data: data
+                })
+            }
+            else {
+                res.status(400).json({
+                    status: "Article Id inconnu",
+                    data: null
+                })
+            }
         }
         catch (err) {
-            res.status(404).json({
-                status: "not found",
+            res.status(500).json({
+                status: "Erreur serveur ou inconnue",
                 data: null
             })
         }
     };
 
-    async postComments(req, res) {
+    async postComment(req, res) {
         const user_id = req.userId
         const article_id = req.params.id
         const message = req.body.message
@@ -61,7 +74,7 @@ class CommentsController {
 
         else {
             try {
-                const data = await commentsService.postComments(message, article_id, user_id);
+                const data = await commentsService.postComment(message, article_id, user_id);
 
                 res.status(201).json({
                     status: "comments created",
@@ -70,15 +83,16 @@ class CommentsController {
             }
 
             catch (err) {
-                res.status(404).json({
-                    status: "not found",
+                res.status(500).json({
+                    status: "fail",
+                    message: "erreur de syntaxe",
                     data: null
                 })
             }
         };
     }
 
-    async putComments(req, res) {
+    async putComment(req, res) {
         const id = Number(req.params.id);
         const user_idLogged = req.userId;
         const message = req.body.message
@@ -115,7 +129,7 @@ class CommentsController {
             }
 
             try {
-                const data = await commentsService.putComments(id, message);
+                const data = await commentsService.putComment(id, message);
                 res.status(200).json({
                     status: "success",
                     message: "comment updated",
@@ -125,15 +139,16 @@ class CommentsController {
             }
 
             catch (err) {
-                res.status(404).json({
-                    status: "not found",
+                res.status(500).json({
+                    status: "fail",
+                    message: "erreur de syntaxe",
                     data: null
                 })
             }
         };
     }
 
-    async deleteComments(req, res) {
+    async deleteComment(req, res) {
         const deleteId = req.params.id;
         const user_idLogged = req.userId
 
@@ -155,14 +170,15 @@ class CommentsController {
             }
             else if (user_idLogged != comment.user_id) {
                 res.status(403).json({
-                    status: "Updated impossible - Bad Authorization",
+                    status: "Delete impossible - Bad Authorization",
                     data: null
                 })
                 return
             }
 
             try {
-                const data = await commentsService.deleteComments(deleteId);
+
+                const data = await commentsService.deleteComment(deleteId);
                 res.status(200).json({
                     status: "deleted",
                     data: data
@@ -171,7 +187,55 @@ class CommentsController {
 
             catch (err) {
                 res.status(500).json({
-                    status: "not found",
+                    status: "fail",
+                    message: "erreur de syntaxe",
+                    data: null
+                })
+            }
+        };
+    }
+
+    async deleteCommentsByArticleId(req, res) {
+        const articleId = req.params.id;
+        const user_idLogged = req.userId
+
+        if (!articleId && !(typeof (articleId) == 'number')) {
+            res.status(400).json({
+                status: "Missing id or incorrect type",
+                data: null
+            })
+        }
+
+        else {
+            const article = await articlesService.selectArticleById(articleId);
+            if (!article) {
+                res.status(400).json({
+                    status: "Article id unknown",
+                    data: null
+                })
+                return
+            }
+            else if (user_idLogged != article.user_id) {
+                res.status(403).json({
+                    status: "Delete impossible - Bad Authorization",
+                    data: null
+                })
+                return
+            }
+
+            try {
+
+                const data = await commentsService.deleteCommentsByArticleId(deleteId);
+                res.status(200).json({
+                    status: "deleted",
+                    data: data
+                })
+            }
+
+            catch (err) {
+                res.status(500).json({
+                    status: "fail",
+                    message: "erreur de syntaxe",
                     data: null
                 })
             }

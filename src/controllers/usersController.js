@@ -2,6 +2,7 @@ const UsersService = require("../services/usersService");
 const usersService = new UsersService();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+
 const accessTokenSecret = process.env.accessTokenSecret;
 
 class UsersController {
@@ -11,13 +12,14 @@ class UsersController {
             const data = await usersService.selectAllUsers();
             res.status(200).json({
                 status: "success",
-                data: data
+                data: data,
+                message: "succes"
             })
         }
 
         catch (err) {
-            res.status(404).json({
-                status: "not found",
+            res.status(500).json({
+                status: "Erreur serveur ou inconnue",
                 data: null
             })
         }
@@ -40,7 +42,7 @@ class UsersController {
         }
         else if (!email) {
             res.status(400).json({
-                status: "Missing password",
+                status: "Missing email",
                 data: null
             })
         }
@@ -56,8 +58,8 @@ class UsersController {
 
                 catch (err) {
                     console.log(err);
-                    res.status(404).json({
-                        status: "not found",
+                    res.status(500).json({
+                        status: "Erreur serveur ou inconnue",
                         data: null
                     })
                 }
@@ -66,8 +68,7 @@ class UsersController {
     }
 
     async login(req, res) {
-        const username = req.body.username;
-        const password = req.body.password;
+        const {username, password} = req.body;
 
         if (!username) {
             res.status(400).json({
@@ -85,12 +86,16 @@ class UsersController {
         else {
             try {
                 const data = await usersService.selectUserByUsername(username);
-                if (!data) {
 
+                if (!data) {
                     res.status(404).json({ error: "User not found" });
-                } else {
-                    const accessToken = jwt.sign({ username: data.id }, accessTokenSecret)
+                } 
+
+                else {
+                    const accessToken = jwt.sign({ username: data.id }, accessTokenSecret);
+
                     const dbHash = data.password;
+
                     bcrypt.compare(password, dbHash, function (err, result) {
                         if (result === true) {
                             res.json({
@@ -105,6 +110,7 @@ class UsersController {
             }
             catch (err) {
                 console.log(err.stack);
+
                 res.status(500).json({ error: "An error occured while trying to log in" });
             }
         }

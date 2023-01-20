@@ -1,10 +1,12 @@
 const { text } = require("express");
 const articlesRouter = require("../routes/articlesRouter");
 const ArticlesService = require("../services/articlesService");
+const CommentsService = require("../services/commentsService");
 const articlesService = new ArticlesService();
+const commentsService = new CommentsService();
 
 class ArticlesController {
-    async getArticles(req, res) {
+    async getAllArticles(req, res) {
         try {
             const data = await articlesService.selectAllArticles();
             res.status(200).json({
@@ -15,7 +17,7 @@ class ArticlesController {
         }
         catch (err) {
             console.log(err.stack)
-            res.status(400).json({
+            res.status(500).json({
                 status: "fail",
                 message: "erreur de syntaxe",
                 data: null
@@ -34,14 +36,15 @@ class ArticlesController {
             })
         }
         catch (err) {
-            res.status(404).json({
-                status: "not found",
+            res.status(500).json({
+                status: "fail",
+                message: "erreur de syntaxe",
                 data: null
             })
         }
     };
 
-    async postArticles(req, res) {
+    async postArticle(req, res) {
         const user_id = req.userId
         const { title, text } = req.body
 
@@ -60,7 +63,7 @@ class ArticlesController {
 
         else {
             try {
-                const data = await articlesService.postArticles(title, text, user_id);
+                const data = await articlesService.postArticle(title, text, user_id);
 
                 res.status(201).json({
                     status: "created",
@@ -69,15 +72,16 @@ class ArticlesController {
             }
 
             catch (err) {
-                res.status(404).json({
-                    status: "not found",
+                res.status(500).json({
+                    status: "fail",
+                    message: "erreur de syntaxe",
                     data: null
                 })
             }
         };
     }
 
-    async putArticles(req, res) {
+    async putArticle(req, res) {
         const id = Number(req.params.id);
         const user_idLogged = req.userId;
         const { title, text } = req.body
@@ -118,7 +122,7 @@ class ArticlesController {
             }
 
             try {
-                const data = await articlesService.putArticles(id, title, text);
+                const data = await articlesService.putArticle(id, title, text);
                 res.status(200).json({
                     status: "success",
                     message: "article updated",
@@ -128,15 +132,62 @@ class ArticlesController {
             }
 
             catch (err) {
-                res.status(404).json({
-                    status: "not found",
+                res.status(500).json({
+                    status: "fail",
+                    message: "erreur de syntaxe",
                     data: null
                 })
             }
         };
     }
 
-    async deleteArticles(req, res) {
+    async deleteArticle(req, res) {
+        const deleteId = req.params.id;
+        const user_idLogged = req.userId
+
+        if (!deleteId && !(typeof (deleteId) == 'number')) {
+            res.status(400).json({
+                status: "Missing id or incorrect type",
+                data: null
+            })
+        }
+
+        else {
+            const article = await articlesService.selectArticleById(deleteId);
+            if (!article) {
+                res.status(400).json({
+                    status: "Article id unknown",
+                    data: null
+                })
+                return
+            }
+            else if (user_idLogged != article[0].user_id) {
+                res.status(403).json({
+                    status: "Delete impossible - Bad Authorization",
+                    data: null
+                })
+                return
+            }
+
+            try {
+                const deletedArticle = await articlesService.deleteArticle(deleteId);
+                res.status(200).json({
+                    status: "deleted",
+                    data: deletedArticle
+                })
+            }
+
+            catch (err) {
+                res.status(500).json({
+                    status: "fail",
+                    message: "erreur de syntaxe",
+                    data: null
+                })
+            }
+        };
+    }
+
+    async deleteArticleWithComments(req, res) {
         const deleteId = req.params.id;
         const user_idLogged = req.userId
 
@@ -165,16 +216,21 @@ class ArticlesController {
             }
 
             try {
-                const data = await articlesService.deleteArticles(deleteId);
+                // delete des commentaires via articleId
+                await commentsService.deleteCommentsByArticleId(deleteId);
+
+                // delete de l'article via son id
+                const deletedArticle = await articlesService.deleteArticle(deleteId);
                 res.status(200).json({
                     status: "deleted",
-                    data: data
+                    data: deletedArticle
                 })
             }
 
             catch (err) {
-                res.status(404).json({
-                    status: "not found",
+                res.status(500).json({
+                    status: "fail",
+                    message: "erreur de syntaxe",
                     data: null
                 })
             }
