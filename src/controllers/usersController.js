@@ -11,15 +11,17 @@ class UsersController {
         try {
             const data = await usersService.selectAllUsers();
             res.status(200).json({
-                status: "success",
-                data: data,
-                message: "succes"
+                status: "Ok",
+                message: "Success",
+                data: data
+                
             })
         }
 
         catch (err) {
             res.status(500).json({
-                status: "Erreur serveur ou inconnue",
+                status: "Fail",
+                message: "Server error or unknown",
                 data: null
             })
         }
@@ -30,19 +32,22 @@ class UsersController {
 
         if (!username) {
             res.status(400).json({
-                status: "Missing username",
+                status: "Fail",
+                message: "Missing username",
                 data: null
             })
         }
         else if (!password) {
             res.status(400).json({
-                status: "Missing password",
+                status: "Fail",
+                message: "Missing password",
                 data: null
             })
         }
         else if (!email) {
             res.status(400).json({
-                status: "Missing email",
+                status: "Fail",
+                message: "Missing email",
                 data: null
             })
         }
@@ -51,7 +56,8 @@ class UsersController {
                 try {
                     const data = await usersService.addUser(username, hash, email);
                     res.status(201).json({
-                        status: "created",
+                        status: "Ok",
+                        message: "Created",
                         data: data
                     })
                 }
@@ -59,7 +65,8 @@ class UsersController {
                 catch (err) {
                     console.log(err);
                     res.status(500).json({
-                        status: "Erreur serveur ou inconnue",
+                        status: "Fail",
+                        message: "Server error or unknown",
                         data: null
                     })
                 }
@@ -72,13 +79,15 @@ class UsersController {
 
         if (!username) {
             res.status(400).json({
-                status: "Missing username",
+                status: "Fail",
+                message: "Missing username",
                 data: null
             })
         }
         else if (!password) {
             res.status(400).json({
-                status: "Missing password",
+                status: "Fail",
+                message: "Missing password",
                 data: null
             })
         }

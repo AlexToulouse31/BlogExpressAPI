@@ -10,16 +10,16 @@ class ArticlesController {
         try {
             const data = await articlesService.selectAllArticles();
             res.status(200).json({
-                status: "success",
-                message: "succes",
+                status: "Ok",
+                message: "Success",
                 data: data
             })
         }
         catch (err) {
             console.log(err.stack)
             res.status(500).json({
-                status: "fail",
-                message: "erreur de syntaxe",
+                status: "Fail",
+                message: "Syntax error",
                 data: null
             })
         }
@@ -31,14 +31,15 @@ class ArticlesController {
             const data = await articlesService.selectArticleById(i);
 
             res.status(200).json({
-                status: "success",
+                status: "Ok",
+                message: "Success",
                 data: data
             })
         }
         catch (err) {
             res.status(500).json({
-                status: "fail",
-                message: "erreur de syntaxe",
+                status: "Fail",
+                message: "Syntax error",
                 data: null
             })
         }
@@ -50,13 +51,15 @@ class ArticlesController {
 
         if (!title && !(typeof (title) == 'string')) {
             res.status(400).json({
-                status: "Missing title or incorrect type",
+                status: "Fail",
+                message: "Missing title or incorrect type",
                 data: null
             })
         }
         else if (!text && !(typeof (text) == 'string')) {
             res.status(400).json({
-                status: "Missing text",
+                status: "Fail",
+                message: "Missing text",
                 data: null
             })
         }
@@ -66,15 +69,16 @@ class ArticlesController {
                 const data = await articlesService.postArticle(title, text, user_id);
 
                 res.status(201).json({
-                    status: "created",
+                    status: "Ok",
+                    message: "Created",
                     data: data
                 })
             }
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }
@@ -88,35 +92,40 @@ class ArticlesController {
 
         if (!title && !(typeof (title) == 'string')) {
             res.status(400).json({
-                status: "Missing title or incorrect type",
-                data: null
+                status: "Fail",
+                message: "Missing title or incorrect type",
+                    data: null
             })
         }
         else if (!text && !(typeof (text) == 'string')) {
             res.status(400).json({
-                status: "Missing text",
-                data: null
+                status: "Fail",
+                message: "Missing text",
+                    data: null
             })
         }
         else if (!id && !(typeof (id) == 'number')) {
             res.status(400).json({
-                status: "Missing id or incorrect type",
-                data: null
+                status: "Fail",
+                message: "Missing id or incorrect type",
+                    data: null
             })
         }
         else {
             const article = await articlesService.selectArticleById(id);
             if (!article) {
                 res.status(400).json({
-                    status: "Article id unknown",
-                    data: null
+                    status: "Fail",
+                    message: "Article id unknown",
+                        data: null
                 })
                 return
             }
             else if (user_idLogged != article[0].user_id) {
                 res.status(403).json({
-                    status: "Updated impossible - Bad Authorization",
-                    data: null
+                    status: "Fail",
+                    message: "Unable to update - Wrong authorization",
+                        data: null
                 })
                 return
             }
@@ -124,8 +133,8 @@ class ArticlesController {
             try {
                 const data = await articlesService.putArticle(id, title, text);
                 res.status(200).json({
-                    status: "success",
-                    message: "article updated",
+                    status: "Ok",
+                    message: "Updated article",
                     data: data
 
                 })
@@ -133,8 +142,8 @@ class ArticlesController {
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }
@@ -147,7 +156,8 @@ class ArticlesController {
 
         if (!deleteId && !(typeof (deleteId) == 'number')) {
             res.status(400).json({
-                status: "Missing id or incorrect type",
+                status: "Fail",
+                message: "Missing identifier or incorrect type",
                 data: null
             })
         }
@@ -156,14 +166,16 @@ class ArticlesController {
             const article = await articlesService.selectArticleById(deleteId);
             if (!article) {
                 res.status(400).json({
-                    status: "Article id unknown",
+                    status: "Fail",
+                    message: "Article id unknown",
                     data: null
                 })
                 return
             }
             else if (user_idLogged != article[0].user_id) {
                 res.status(403).json({
-                    status: "Delete impossible - Bad Authorization",
+                    status: "Fail",
+                    message: "Unable to delete - Wrong authorization",
                     data: null
                 })
                 return
@@ -172,15 +184,16 @@ class ArticlesController {
             try {
                 const deletedArticle = await articlesService.deleteArticle(deleteId);
                 res.status(200).json({
-                    status: "deleted",
+                    status: "Fail",
+                    message: "Deleted",
                     data: deletedArticle
                 })
             }
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }
@@ -193,8 +206,9 @@ class ArticlesController {
 
         if (!deleteId && !(typeof (deleteId) == 'number')) {
             res.status(400).json({
-                status: "Missing id or incorrect type",
-                data: null
+                status: "Fail",
+                message: "Missing identifier or incorrect type",
+                    data: null
             })
         }
 
@@ -202,15 +216,17 @@ class ArticlesController {
             const article = await articlesService.selectArticleById(deleteId);
             if (!article) {
                 res.status(400).json({
-                    status: "Article id unknown",
-                    data: null
+                    status: "Fail",
+                    message:"Article id unknown",
+                        data: null
                 })
                 return
             }
             else if (user_idLogged != article[0].user_id) {
                 res.status(403).json({
-                    status: "Updated impossible - Bad Authorization",
-                    data: null
+                    status: "Fail",
+                    message:"Unable to update - Wrong authorization",
+                        data: null
                 })
                 return
             }
@@ -222,15 +238,16 @@ class ArticlesController {
                 // delete de l'article via son id
                 const deletedArticle = await articlesService.deleteArticle(deleteId);
                 res.status(200).json({
-                    status: "deleted",
-                    data: deletedArticle
+                    status: "Fail",
+                    message: "Deleted",
+                        data: deletedArticle
                 })
             }
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }

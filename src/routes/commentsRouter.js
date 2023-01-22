@@ -15,7 +15,7 @@ commentsRouter.post('/article/:id', authenticateJWT, commentsController.postComm
 commentsRouter.put('/:id', authenticateJWT, commentsController.putComment);
 //permet de supprimer un commentaire
 commentsRouter.delete('/:id', authenticateJWT, commentsController.deleteComment);
-// permet de supprimer tous les commentaires d'un article
+// permet de supprimer tout les commentaires par l'articleId
 commentsRouter.delete('/:id', authenticateJWT, commentsController.deleteCommentsByArticleId);
 
 

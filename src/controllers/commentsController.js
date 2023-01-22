@@ -35,20 +35,23 @@ class CommentsController {
 
             if (!data) {
                 res.status(200).json({
-                    status: "success",
+                    status: "Ok",
+                    message: "success",
                     data: data
                 })
             }
             else {
                 res.status(400).json({
-                    status: "Article Id inconnu",
+                    status: "Fail",
+                    message: "Article id unknown",
                     data: null
                 })
             }
         }
         catch (err) {
             res.status(500).json({
-                status: "Erreur serveur ou inconnue",
+                status: "Fail",
+                message: "Server error or unknown",
                 data: null
             })
         }
@@ -61,13 +64,15 @@ class CommentsController {
 
         if (!message && !(typeof (message) == 'string')) {
             res.status(400).json({
-                status: "Missing message or incorrect type",
+                status: "Fail",
+                message: "Missing message or incorrect type",
                 data: null
             })
         }
         else if (!article_id && !(typeof (article_id) == 'number')) {
             res.status(400).json({
-                status: "Missing article or incorrect type",
+                status: "Fail",
+                message: "Missing article or incorrect type",
                 data: null
             })
         }
@@ -77,15 +82,16 @@ class CommentsController {
                 const data = await commentsService.postComment(message, article_id, user_id);
 
                 res.status(201).json({
-                    status: "comments created",
+                    status: "Ok",
+                    message: "Comments created",
                     data: data
                 })
             }
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }
@@ -99,14 +105,16 @@ class CommentsController {
 
         if (!message && !(typeof (message) == 'string')) {
             res.status(400).json({
-                status: "Missing message or incorrect type",
+                status: "Fail",
+                message: "Missing message or incorrect type",
                 data: null
             })
         }
 
         else if (!id && !(typeof (id) == 'number')) {
             res.status(400).json({
-                status: "Missing article id or incorrect type",
+                status: "Fail",
+                message: "Missing article id or incorrect type",
                 data: null
             })
         }
@@ -115,14 +123,16 @@ class CommentsController {
             const comment = await commentsService.selectCommentById(id);
             if (!comment) {
                 res.status(400).json({
-                    status: "Comment id unknown",
+                    status: "Fail",
+                    message: "Comment id unknown",
                     data: null
                 })
                 return
             }
             else if (user_idLogged != comment.user_id) {
                 res.status(403).json({
-                    status: "Updated impossible - Bad Authorization",
+                    status: "Fail",
+                    message: "Unable to update - Wrong authorization",
                     data: null
                 })
                 return
@@ -131,8 +141,8 @@ class CommentsController {
             try {
                 const data = await commentsService.putComment(id, message);
                 res.status(200).json({
-                    status: "success",
-                    message: "comment updated",
+                    status: "Ok",
+                    message: "Comment updated",
                     data: data
 
                 })
@@ -140,8 +150,8 @@ class CommentsController {
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }
@@ -154,7 +164,8 @@ class CommentsController {
 
         if (!deleteId && !(typeof (deleteId) == 'number')) {
             res.status(400).json({
-                status: "Missing id or incorrect type",
+                status: "Fail",
+                message: "Missing id or incorrect type",
                 data: null
             })
         }
@@ -163,14 +174,16 @@ class CommentsController {
             const comment = await commentsService.selectCommentById(deleteId);
             if (!comment) {
                 res.status(400).json({
-                    status: "Comment id unknown",
+                    status: "Fail",
+                    message: "Comment id unknown",
                     data: null
                 })
                 return
             }
             else if (user_idLogged != comment.user_id) {
                 res.status(403).json({
-                    status: "Delete impossible - Bad Authorization",
+                    status: "Fail",
+                    message: "Unable to delete - Wrong authorization",
                     data: null
                 })
                 return
@@ -180,15 +193,16 @@ class CommentsController {
 
                 const data = await commentsService.deleteComment(deleteId);
                 res.status(200).json({
-                    status: "deleted",
+                    status: "Ok",
+                    message: "Deleted",
                     data: data
                 })
             }
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }
@@ -201,7 +215,8 @@ class CommentsController {
 
         if (!articleId && !(typeof (articleId) == 'number')) {
             res.status(400).json({
-                status: "Missing id or incorrect type",
+                status: "Fail",
+                message: "Missing id or incorrect type",
                 data: null
             })
         }
@@ -210,14 +225,16 @@ class CommentsController {
             const article = await articlesService.selectArticleById(articleId);
             if (!article) {
                 res.status(400).json({
-                    status: "Article id unknown",
+                    status: "Fail",
+                    message: "Article id unknown",
                     data: null
                 })
                 return
             }
             else if (user_idLogged != article.user_id) {
                 res.status(403).json({
-                    status: "Delete impossible - Bad Authorization",
+                    status: "Fail",
+                    message: "Unable to delete - Wrong authorization",
                     data: null
                 })
                 return
@@ -227,15 +244,16 @@ class CommentsController {
 
                 const data = await commentsService.deleteCommentsByArticleId(deleteId);
                 res.status(200).json({
-                    status: "deleted",
+                    status: "Fail",
+                    message: "Deleted",
                     data: data
                 })
             }
 
             catch (err) {
                 res.status(500).json({
-                    status: "fail",
-                    message: "erreur de syntaxe",
+                    status: "Fail",
+                    message: "Syntax error",
                     data: null
                 })
             }

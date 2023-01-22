@@ -14,9 +14,9 @@ articlesRouter.get('/:id', articlesController.getArticleById);
 articlesRouter.post('/', authenticateJWT, articlesController.postArticle);
 //permet de modifier un article
 articlesRouter.put('/:id', authenticateJWT, articlesController.putArticle);
-
+//permet de supprimer un article
 articlesRouter.delete('/:id', authenticateJWT, articlesController.deleteArticle);
-
+//permet de supprimer un article et tout les commentaires associés
 articlesRouter.delete('/:id/comments', authenticateJWT, articlesController.deleteArticleWithComments);
 
 module.exports = articlesRouter
